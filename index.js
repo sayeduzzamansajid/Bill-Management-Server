@@ -1,6 +1,6 @@
-const express = require('express');
-const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const express = require("express");
+const cors = require("cors");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -13,7 +13,7 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+  },
 });
 
 async function run() {
@@ -22,16 +22,35 @@ async function run() {
     const db = client.db("Bill-Management");
     const billCollection = db.collection("bills");
 
-    app.get('/', async (req, res) => {
+    app.get("/", async (req, res) => {
       try {
         const result = await billCollection
           .find()
           .sort({ date: -1 })
           .limit(6)
           .toArray();
-          console.log(result);
+        console.log(result);
         res.send(result);
       } catch (err) {
+        res.status(500).send({ message: "Error fetching bills" });
+      }
+    });
+
+    app.get("/all-bills", async (req, res) => {
+      try {
+        const result = await billCollection.find().toArray();
+        res.send(result);
+      } catch (error) {
+        res.status(500).send({ message: "Error fetching bills" });
+      }
+    });
+
+    app.get("/bills/:id", async (req, res) => {
+      const id = req.params.id ;
+      try {
+        const result = await billCollection.findOne({_id:new ObjectId(id)});
+        res.send(result);
+      } catch (error) {
         res.status(500).send({ message: "Error fetching bills" });
       }
     });
