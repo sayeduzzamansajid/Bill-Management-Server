@@ -1,14 +1,14 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors({origin: "*", credentials: true}));
+app.use(cors({ origin: "*", credentials: true }));
 app.use(express.json());
 
-const uri =
-  "mongodb+srv://billManager:5aqEgCjlbM8LlGSw@orioncluster.vzkshzy.mongodb.net/?appName=orionCluster";
+const uri = `${process.env.MONGODB_URI}`
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -96,9 +96,9 @@ async function run() {
     });
 
     //my bills
-    app.post("/bills/my-bills", async (req, res) => {
+    app.get("/bills/my-bills", async (req, res) => {
       try {
-        const { email } = req.body;
+        const { email } = req.query;
 
         // console.log("Searching for:", email);
         const query = { email: email };
